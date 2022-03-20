@@ -23,7 +23,7 @@ func showLine(line int) string {
 	if err != nil {
 		return "File corrupted"
 	}
-	dataList := strings.Fields(string(data))
+	dataList := strings.Split(string(data), "\n")
 	return dataList[line-1]
 }
 
