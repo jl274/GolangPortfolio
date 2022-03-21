@@ -21,11 +21,11 @@ func main() {
 func adder() int {
 	num1 := flag.Int("liczba1", 0, "Number1")
 	num2 := flag.Int("liczba2", 0, "Number2")
+	flag.Parse()
 	intNum1 := *num1
 	intNum2 := *num2
-	flag.Parse()
 	if intNum1 == 0 && intNum2 == 0 {
-		fmt.Println("Nie wykryto liczb.\n Podaj liczbę 1:")
+		fmt.Println("Nie wykryto liczb.\nPodaj liczbę 1:")
 		fmt.Scanf("%d", &intNum1)
 		fmt.Println("Podaj liczbę 2:")
 		fmt.Scanf("%d", &intNum2)
