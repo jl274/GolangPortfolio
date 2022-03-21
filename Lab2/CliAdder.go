@@ -1,14 +1,5 @@
 package main
 
-/*
-Należy za pomocą programu dodać dwie liczby podane jako argumenty wiersza poleceń (CLI)opcje będą takie:
-
--liczba1 N-liczba2 Mw przypadku gdy nie poda się opcji,
-program powinien umożliwić wczytanie liczb z klawiatury
-Przykładowe uruchomienie:go run program.go -liczba1 5 -liczba2 712
-
-*/
-
 import (
 	"flag"
 	"fmt"
@@ -26,6 +17,7 @@ func adder() int {
 	intNum2 := *num2
 	if intNum1 == 0 && intNum2 == 0 {
 		fmt.Println("Nie wykryto liczb.\nPodaj liczbę 1:")
+		// fmt.Scanf("%d\n", &intNum1)    <- Problem with new line in windows
 		fmt.Scanf("%d", &intNum1)
 		fmt.Println("Podaj liczbę 2:")
 		fmt.Scanf("%d", &intNum2)
