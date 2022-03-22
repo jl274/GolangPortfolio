@@ -15,3 +15,7 @@ This will convert 72C to K
 
 This will convert 20C (default) to F (default)
 > go run TempConv.go -value 20
+
+## Strings
+Contains some useful functions connected with strings: *anagram, palindrome, 
+sorting alphabetically, contains char*
