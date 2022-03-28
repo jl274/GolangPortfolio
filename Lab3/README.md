@@ -8,6 +8,7 @@ All using maps.
 
 Example:
 > go run NicknameGenerator.go -day 8 -name Jakub -surname Lord
+
 Result:
 ```text
 Lord Wielki Rozczłonkowany
