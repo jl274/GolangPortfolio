@@ -52,3 +52,28 @@ The end!
 *Score :  8/10*
 ***************
 ```
+
+## RunLengthEncoding.go
+Run-length encoding (RLE) is a simple form of data compression, 
+where runs (consecutive data elements) are replaced by just one data value and count.
+
+Flags:
+* *encode* Present if wants encoding
+* *decode* Present if wants decoding
+* *value* StringToBeEncodedOrDecoded
+
+Usage:
+> go run RunLengthEncoding.go -encode -value AABCCCDEEEE
+
+Result
+```text
+2AB3CD4E
+```
+
+Usage:
+> go run RunLengthEncoding.go -decode -value 2AB3CD4E
+
+Result
+```text
+AABCCCDEEEE
+```
