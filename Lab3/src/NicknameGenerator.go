@@ -22,22 +22,24 @@ func main() {
 	} else {
 		dob = *dobFlag
 	}
+
 	if *nameFlag == "unset" {
 		fmt.Println("Name not detected\nEnter your name")
-		fmt.Scanf("%s", &name)
+		fmt.Scanf("%s\n", &name)
 	} else {
 		name = *nameFlag
 	}
+
 	if *surnameFlag == "unset" {
 		fmt.Println("Surname not detected\nEnter your surname")
-		fmt.Scanf("%s", &surname)
+		fmt.Scanf("%s\n", &surname)
 	} else {
 		surname = *surnameFlag
 	}
 
 	nickname := dateOfBirthMap[dob] +
 		nameMap[strings.ToLower(string(name[0:1][0]))] +
-		surnameMap[strings.ToLower(string(surname[:1][0]))]
+		surnameMap[strings.ToLower(string(surname[0:1][0]))]
 	fmt.Println(nickname)
 }
 
