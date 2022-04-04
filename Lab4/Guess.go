@@ -1,8 +1,12 @@
 package main
 
 import (
+	"encoding/csv"
 	"fmt"
+	"log"
 	"math/rand"
+	"os"
+	"path/filepath"
 	"sort"
 	"strconv"
 	"strings"
@@ -12,11 +16,13 @@ import (
 func main() {
 	highscore := make([]Score, 0)
 	for {
-		nickname, gameScore := game()
+		nickname, gameScore, numGuessed := game()
 		if gameScore != 0 {
 			highscore = append(highscore, Score{
-				nickname: nickname,
-				result:   gameScore,
+				nickname:      nickname,
+				result:        gameScore,
+				guessedNumber: numGuessed,
+				date:          time.Now(),
 			})
 			highscore = sortScores(highscore)
 		}
@@ -28,7 +34,7 @@ func main() {
 
 }
 
-func game() (string, int) {
+func game() (string, int, int) {
 	fmt.Printf("Welcome to THE GAME!\nYou have to guess number between 1 and 500.\n")
 	fmt.Println("You can type \"END\" if you want to resign.")
 	numberToBeGuessed := randomNumber(1, 500)
@@ -42,11 +48,11 @@ func game() (string, int) {
 		if checkGuess(numberToBeGuessed, intGuess) {
 			fmt.Printf("You've made in in %d tries", tries)
 			nickname := ascForNickname()
-			return nickname, tries
+			return nickname, tries, numberToBeGuessed
 		}
 		tries++
 	}
-	return "", 0
+	return "", 0, numberToBeGuessed
 
 }
 
@@ -106,8 +112,10 @@ func askIfPlayAgain() bool {
 }
 
 type Score struct {
-	nickname string
-	result   int
+	nickname      string
+	result        int
+	guessedNumber int
+	date          time.Time
 }
 
 func sortScores(scores []Score) []Score {
@@ -121,6 +129,7 @@ func printScores(scores []Score) {
 	place := 1
 	for _, score := range scores {
 		fmt.Printf("%d. %s in %d tries\n", place, score.nickname, score.result)
+		fmt.Println(score.date.Date())
 		place++
 	}
 }
@@ -131,4 +140,26 @@ func ascForNickname() string {
 	fmt.Scanf("%s\n", &nickname)
 	fmt.Println()
 	return nickname
+}
+
+func loadDataFromCSV() [][]string {
+	absPath, _ := filepath.Abs("results.csv")
+	f, err := os.Open(absPath)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer func(f *os.File) {
+		err := f.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}(f)
+
+	csvReader := csv.NewReader(f)
+	data, err := csvReader.ReadAll()
+	if err != nil {
+		log.Fatal(err)
+	}
+	return data
 }
