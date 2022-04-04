@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math/rand"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -13,19 +14,22 @@ func main() {
 
 func game() {
 	fmt.Printf("Welcome to THE GAME!\nYou have to guess number between 1 and 500.\n")
+	fmt.Println("You can type \"END\" if you want to resign.")
 	numberToBeGuessed := randomNumber(1, 500)
-	var guess string
 	tries := 1
 	for {
-		fmt.Printf("Enter number:\t")
-		fmt.Scanf("%s\n", &guess)
+		guess := makeGuess()
+		if end(guess, strconv.Itoa(numberToBeGuessed)) {
+			break
+		}
 		intGuess, _ := strconv.Atoi(guess)
 		if checkGuess(numberToBeGuessed, intGuess) {
+			fmt.Printf("You've made in in %d tries", tries)
 			break
 		}
 		tries++
 	}
-	fmt.Printf("You've made in in %d tries", tries)
+
 }
 
 func randomNumber(min, max int) int {
@@ -33,9 +37,16 @@ func randomNumber(min, max int) int {
 	return rand.Intn(max-min+1) + min
 }
 
+func makeGuess() string {
+	var guess string
+	fmt.Printf("Enter number:\t")
+	fmt.Scanf("%s\n", &guess)
+	return guess
+}
+
 func checkGuess(number, guess int) bool {
 	if number == guess {
-		fmt.Printf("Congratulations!\nYou've guessed the number \"%d\"\n", number)
+		fmt.Printf("\nCongratulations!\nYou've guessed the number \"%d\"\n", number)
 		return true
 	} else if guess > number {
 		fmt.Printf("No, %d is too big!\n", guess)
@@ -44,4 +55,12 @@ func checkGuess(number, guess int) bool {
 		fmt.Printf("No, %d is too small!\n", guess)
 		return false
 	}
+}
+
+func end(guess, correct string) bool {
+	if strings.ToUpper(guess) == "END" {
+		fmt.Printf("\nYou've resigned.\nThe number was \"%s\"\n", correct)
+		return true
+	}
+	return false
 }
