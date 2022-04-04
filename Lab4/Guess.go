@@ -3,22 +3,32 @@ package main
 import (
 	"fmt"
 	"math/rand"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
 )
 
 func main() {
+	highscore := make([]Score, 0)
 	for {
-		game()
+		nickname, gameScore := game()
+		if gameScore != 0 {
+			highscore = append(highscore, Score{
+				nickname: nickname,
+				result:   gameScore,
+			})
+			highscore = sortScores(highscore)
+		}
 		if !askIfPlayAgain() {
+			printScores(highscore)
 			break
 		}
 	}
 
 }
 
-func game() {
+func game() (string, int) {
 	fmt.Printf("Welcome to THE GAME!\nYou have to guess number between 1 and 500.\n")
 	fmt.Println("You can type \"END\" if you want to resign.")
 	numberToBeGuessed := randomNumber(1, 500)
@@ -31,10 +41,12 @@ func game() {
 		intGuess, _ := strconv.Atoi(guess)
 		if checkGuess(numberToBeGuessed, intGuess) {
 			fmt.Printf("You've made in in %d tries", tries)
-			break
+			nickname := ascForNickname()
+			return nickname, tries
 		}
 		tries++
 	}
+	return "", 0
 
 }
 
@@ -91,4 +103,32 @@ func askIfPlayAgain() bool {
 			fmt.Println("Invalid option!")
 		}
 	}
+}
+
+type Score struct {
+	nickname string
+	result   int
+}
+
+func sortScores(scores []Score) []Score {
+	sort.Slice(scores, func(i, j int) bool {
+		return scores[i].result < scores[j].result
+	})
+	return scores
+}
+
+func printScores(scores []Score) {
+	place := 1
+	for _, score := range scores {
+		fmt.Printf("%d. %s in %d tries\n", place, score.nickname, score.result)
+		place++
+	}
+}
+
+func ascForNickname() string {
+	var nickname string
+	fmt.Printf("Enter your nickanme:\t")
+	fmt.Scanf("%s\n", &nickname)
+	fmt.Println()
+	return nickname
 }
