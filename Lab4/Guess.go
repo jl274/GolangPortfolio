@@ -14,7 +14,7 @@ import (
 )
 
 func main() {
-	highscore := make([]Score, 0)
+	highscore := CSVToList(loadDataFromCSV())
 	for {
 		nickname, gameScore, numGuessed := game()
 		if gameScore != 0 {
@@ -27,7 +27,7 @@ func main() {
 			highscore = sortScores(highscore)
 		}
 		if !askIfPlayAgain() {
-			printScores(highscore)
+			printScores(highscore, 10)
 			break
 		}
 	}
@@ -46,7 +46,7 @@ func game() (string, int, int) {
 		}
 		intGuess, _ := strconv.Atoi(guess)
 		if checkGuess(numberToBeGuessed, intGuess) {
-			fmt.Printf("You've made in in %d tries", tries)
+			fmt.Printf("You've made in in %d tries\n", tries)
 			nickname := ascForNickname()
 			return nickname, tries, numberToBeGuessed
 		}
@@ -125,12 +125,17 @@ func sortScores(scores []Score) []Score {
 	return scores
 }
 
-func printScores(scores []Score) {
+func printScores(scores []Score, howMany int) {
 	place := 1
-	for _, score := range scores {
-		fmt.Printf("%d. %s in %d tries\n", place, score.nickname, score.result)
-		fmt.Println(score.date.Date())
+	for index, score := range scores {
+		y, m, d := score.date.Date()
+		h, min, _ := score.date.Clock()
+		fmt.Printf("%d. %s in %d tries (%d-%s-%d %d:%d)\n", place, score.nickname, score.result,
+			y, m, d, h, min)
 		place++
+		if index == howMany {
+			break
+		}
 	}
 }
 
@@ -140,6 +145,23 @@ func ascForNickname() string {
 	fmt.Scanf("%s\n", &nickname)
 	fmt.Println()
 	return nickname
+}
+
+func CSVToList(csvData [][]string) []Score {
+	scoreList := make([]Score, 0)
+	for _, dataScore := range csvData {
+		dateTime, _ := time.Parse("2006-01-02 15:04", dataScore[3][:16])
+		guessedNumber, _ := strconv.Atoi(dataScore[2])
+		tries, _ := strconv.Atoi(dataScore[1])
+		subScore := Score{
+			nickname:      dataScore[0],
+			result:        tries,
+			guessedNumber: guessedNumber,
+			date:          dateTime,
+		}
+		scoreList = append(scoreList, subScore)
+	}
+	return scoreList
 }
 
 func loadDataFromCSV() [][]string {
