@@ -31,7 +31,8 @@ func main() {
 			break
 		}
 	}
-
+	writeDataToCSV(scoresToCSVPreparedData(highscore))
+	fmt.Println("\nGoodbye! See you soon :)")
 }
 
 func game() (string, int, int) {
@@ -184,4 +185,43 @@ func loadDataFromCSV() [][]string {
 		log.Fatal(err)
 	}
 	return data
+}
+
+func writeDataToCSV(data [][]string) {
+	absPath, _ := filepath.Abs("results.csv")
+	csvFile, err := os.OpenFile(absPath, os.O_WRONLY, 0777)
+
+	if err != nil {
+		log.Fatalf("failed opening file: %s", err)
+	}
+
+	csvwriter := csv.NewWriter(csvFile)
+
+	err2 := csvwriter.WriteAll(data)
+	if err2 != nil {
+		log.Fatal(err2)
+	}
+
+	defer func(csvFile *os.File) {
+		err := csvFile.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}(csvFile)
+
+}
+
+func scoresToCSVPreparedData(scores []Score) [][]string {
+	preparedData := make([][]string, 0)
+
+	for _, score := range scores {
+		preparedData = append(preparedData, []string{
+			score.nickname,
+			strconv.Itoa(score.result),
+			strconv.Itoa(score.guessedNumber),
+			score.date.String(),
+		})
+	}
+
+	return preparedData
 }
