@@ -9,7 +9,13 @@ import (
 )
 
 func main() {
-	game()
+	for {
+		game()
+		if !askIfPlayAgain() {
+			break
+		}
+	}
+
 }
 
 func game() {
@@ -63,4 +69,26 @@ func end(guess, correct string) bool {
 		return true
 	}
 	return false
+}
+
+func askIfPlayAgain() bool {
+	var answer string
+	fmt.Printf("\nPlay again? [YES/NO]\n")
+	fmt.Scanf("%s\n", &answer)
+	answer = strings.ToUpper(answer)
+	for {
+		switch answer {
+
+		case "YES", "Y":
+			fmt.Println()
+			return true
+
+		case "NO", "N":
+			fmt.Println()
+			return false
+
+		default:
+			fmt.Println("Invalid option!")
+		}
+	}
 }
