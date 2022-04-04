@@ -14,7 +14,17 @@ import (
 )
 
 func main() {
+	var blockString string
 	highscore := CSVToList(loadDataFromCSV())
+	fmt.Println("**********************")
+	fmt.Printf("Welcome to THE GAME!\nHighscore (TOP 3):\n")
+	printScores(highscore, 3)
+	fmt.Printf("**********************\n\nClick Enter to continue...")
+	fmt.Scanf("%s\n", &blockString)
+	fmt.Println()
+
+	canSave := false
+
 	for {
 		nickname, gameScore, numGuessed := game()
 		if gameScore != 0 {
@@ -25,25 +35,29 @@ func main() {
 				date:          time.Now(),
 			})
 			highscore = sortScores(highscore)
+			canSave = true
 		}
 		if !askIfPlayAgain() {
 			printScores(highscore, 10)
 			break
 		}
 	}
-	writeDataToCSV(scoresToCSVPreparedData(highscore))
+	if canSave {
+		writeDataToCSV(scoresToCSVPreparedData(highscore))
+	}
 	fmt.Println("\nGoodbye! See you soon :)")
 }
 
 func game() (string, int, int) {
-	fmt.Printf("Welcome to THE GAME!\nYou have to guess number between 1 and 500.\n")
+	fmt.Println("**********************")
+	fmt.Printf("New Game!\nYou have to guess number between 1 and 500.\n")
 	fmt.Println("You can type \"END\" if you want to resign.")
 	numberToBeGuessed := randomNumber(1, 500)
 	tries := 1
 	for {
 		guess := makeGuess()
 		if end(guess, strconv.Itoa(numberToBeGuessed)) {
-			break
+			return "", 0, numberToBeGuessed
 		}
 		intGuess, _ := strconv.Atoi(guess)
 		if checkGuess(numberToBeGuessed, intGuess) {
@@ -53,7 +67,6 @@ func game() (string, int, int) {
 		}
 		tries++
 	}
-	return "", 0, numberToBeGuessed
 
 }
 
@@ -134,7 +147,7 @@ func printScores(scores []Score, howMany int) {
 		fmt.Printf("%d. %s in %d tries (%d-%s-%d %d:%d)\n", place, score.nickname, score.result,
 			y, m, d, h, min)
 		place++
-		if index == howMany {
+		if index == howMany-1 {
 			break
 		}
 	}
