@@ -15,7 +15,7 @@ import (
 
 func main() {
 	var blockString string
-	highscore := CSVToList(loadDataFromCSV())
+	highscore := CSVToList(LoadDataFromCSV())
 	fmt.Println("**********************")
 	fmt.Printf("Welcome to THE GAME!\nHighscore (TOP 3):\n")
 	printScores(highscore, 3)
@@ -178,7 +178,7 @@ func CSVToList(csvData [][]string) []Score {
 	return scoreList
 }
 
-func loadDataFromCSV() [][]string {
+func LoadDataFromCSV() [][]string {
 	absPath, _ := filepath.Abs("results.csv")
 	f, err := os.Open(absPath)
 	if err != nil {
