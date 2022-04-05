@@ -119,4 +119,5 @@ Hardest to gues is range <201, 226) with average 13.33 tries.
 ```
 
 Plot:
-![rangeAnalysis.png](rangeAnalysis.png)
+
+![image info](./rangeAnylysis.png)
