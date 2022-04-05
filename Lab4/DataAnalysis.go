@@ -18,10 +18,18 @@ func main() {
 
 func printAnalysis(data []Score) {
 	fmt.Println("***********************")
+	fmt.Println("-----OVERALL STATS-----")
 	avgGuess, avgNumber, played := avgTries(data)
 	fmt.Printf("There were %d games played\n", played)
 	fmt.Printf("Number was guessed average in %f round\n", avgGuess)
 	fmt.Printf("Average number to be guessed was %d \n", avgNumber)
+	fmt.Println("***********************")
+	fmt.Println("-----RANGE  STATS-----")
+	rangeAnalysis := mapScoresToResultRange(data, makeRangeList(1, 501, 20))
+	for _, subRange := range rangeAnalysis {
+		fmt.Printf("In range <%d, %d) number was guessed in average %.2f tries.\n",
+			subRange.min, subRange.max, intListAvg(subRange.triesList))
+	}
 	fmt.Println("***********************")
 }
 
@@ -87,6 +95,14 @@ type ResultRange struct {
 	min       int
 	max       int
 	triesList []int
+}
+
+func intListAvg(list []int) float64 {
+	sum := 0
+	for _, elem := range list {
+		sum += elem
+	}
+	return float64(sum) / float64(len(list))
 }
 
 func makeRangeList(min, max, number int) []ResultRange {
