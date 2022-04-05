@@ -23,8 +23,10 @@ func printAnalysis(data []Score) {
 	fmt.Println("-----OVERALL STATS-----")
 
 	avgGuess, avgNumber, played := avgTries(data)
+	trend := trendTries(data)
 	fmt.Printf("There were %d games played\n", played)
-	fmt.Printf("Number was guessed average in %f round\n", avgGuess)
+	fmt.Printf("Number was guessed average in %.2f round\n", avgGuess)
+	fmt.Printf("Median of tries to guess the number was %.2f \n", trend)
 	fmt.Printf("Average number to be guessed was %d \n", avgNumber)
 
 	fmt.Println("***********************")
@@ -57,6 +59,14 @@ func avgTries(data []Score) (float64, int, int) {
 		tries += game.result
 	}
 	return float64(tries) / float64(games), numberToBeGuessed / games, games
+}
+
+func trendTries(data []Score) float64 {
+	if len(data)%2 == 0 {
+		return float64(data[len(data)/2].result)
+	} else {
+		return (float64(data[len(data)/2].result) + float64(data[(len(data)/2)+1].result)) / 2
+	}
 }
 
 func CSVToList(csvData [][]string) []Score {
