@@ -3,6 +3,10 @@ package main
 import (
 	"encoding/csv"
 	"fmt"
+	"gonum.org/v1/plot"
+	"gonum.org/v1/plot/plotter"
+	"gonum.org/v1/plot/plotutil"
+	"gonum.org/v1/plot/vg"
 	"log"
 	"math"
 	"os"
@@ -13,11 +17,11 @@ import (
 
 func main() {
 	data := CSVToList(LoadDataFromCSV())
-	printAnalysis(data)
-
+	resultRangeList := printAnalysis(data)
+	makePlot(resultRangeList)
 }
 
-func printAnalysis(data []Score) {
+func printAnalysis(data []Score) []ResultRange {
 	fmt.Println("***********************")
 
 	fmt.Println("-----OVERALL STATS-----")
@@ -47,6 +51,8 @@ func printAnalysis(data []Score) {
 		max.min, max.max, intListAvg(max.triesList))
 
 	fmt.Println("************************")
+
+	return rangeAnalysis
 }
 
 func avgTries(data []Score) (float64, int, int) {
@@ -183,4 +189,43 @@ func getMinMaxFromResultRangeList(rangeList []ResultRange) (ResultRange, ResultR
 	}
 
 	return min, max
+}
+
+func makePlot(data []ResultRange) {
+
+	p := plot.New()
+
+	p.Title.Text = "Average number of guesses needed to unveil the number"
+	p.X.Label.Text = "Number to be guessed"
+	p.Y.Label.Text = "Number of tries to guess correctly"
+
+	err := plotutil.AddLines(p,
+		makePlotData(data),
+	)
+	if err != nil {
+		panic(err)
+	}
+
+	if err := p.Save(5*vg.Inch, 5*vg.Inch, "rangeAnylysis.png"); err != nil {
+		panic(err)
+	}
+}
+
+func makePlotData(data []ResultRange) plotter.XYs {
+	pts := make(plotter.XYs, len(data))
+	for i, value := range data {
+		avg := intListAvg(value.triesList)
+		if math.IsNaN(avg) {
+			continue
+		}
+		pts[i].X = float64((value.min + value.max) / 2)
+		pts[i].Y = avg
+	}
+	ptsRefactored := make(plotter.XYs, 0)
+	for _, points := range pts {
+		if points.X != 0 {
+			ptsRefactored = append(ptsRefactored, points)
+		}
+	}
+	return ptsRefactored
 }
