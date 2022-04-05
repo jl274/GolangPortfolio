@@ -4,6 +4,7 @@ import (
 	"encoding/csv"
 	"fmt"
 	"log"
+	"math"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -18,19 +19,32 @@ func main() {
 
 func printAnalysis(data []Score) {
 	fmt.Println("***********************")
+
 	fmt.Println("-----OVERALL STATS-----")
+
 	avgGuess, avgNumber, played := avgTries(data)
 	fmt.Printf("There were %d games played\n", played)
 	fmt.Printf("Number was guessed average in %f round\n", avgGuess)
 	fmt.Printf("Average number to be guessed was %d \n", avgNumber)
+
 	fmt.Println("***********************")
+
 	fmt.Println("-----RANGE  STATS-----")
+
 	rangeAnalysis := mapScoresToResultRange(data, makeRangeList(1, 501, 20))
 	for _, subRange := range rangeAnalysis {
 		fmt.Printf("In range <%d, %d) number was guessed in average %.2f tries.\n",
 			subRange.min, subRange.max, intListAvg(subRange.triesList))
 	}
-	fmt.Println("***********************")
+	min, max := getMinMaxFromResultRangeList(rangeAnalysis)
+	fmt.Println("************************")
+	fmt.Println("---HARDEST VS EASIEST---")
+	fmt.Printf("Easiest to gues is range <%d, %d) with average %.2f tries.\n",
+		min.min, min.max, intListAvg(min.triesList))
+	fmt.Printf("Hardest to gues is range <%d, %d) with average %.2f tries.\n",
+		max.min, max.max, intListAvg(max.triesList))
+
+	fmt.Println("************************")
 }
 
 func avgTries(data []Score) (float64, int, int) {
@@ -133,4 +147,30 @@ func mapScoresToResultRange(data []Score, rangeList []ResultRange) []ResultRange
 	}
 
 	return rangeList
+}
+
+func getMinMaxFromResultRangeList(rangeList []ResultRange) (ResultRange, ResultRange) {
+	var max ResultRange
+	var min ResultRange
+	isSet := false
+
+	for _, subRange := range rangeList {
+		avg := intListAvg(subRange.triesList)
+
+		if math.IsNaN(avg) {
+			continue
+		} else if !isSet {
+			max = subRange
+			min = subRange
+			isSet = true
+		} else {
+			if avg > intListAvg(max.triesList) {
+				max = subRange
+			} else if avg < intListAvg(min.triesList) {
+				min = subRange
+			}
+		}
+	}
+
+	return min, max
 }
