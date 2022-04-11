@@ -11,7 +11,7 @@ var xTerrarium int = 15
 var yTerrarium int = 15
 
 func main() {
-	Simulation(30, false)
+	Simulation(100, false)
 }
 
 // Simulation ----------------------------------------------
@@ -55,21 +55,21 @@ func (position *Position) move(x, y int) {
 // Ant -----------------------------------------------------
 type Ant struct {
 	Position
-	leaf Leaf
+	leaf *Leaf
 }
 
 func constructRandomAnt() Ant {
 	x := randomNumber(0, xTerrarium-1)
 	y := randomNumber(0, yTerrarium-1)
 	antPosition := Position{x, y}
-	return Ant{antPosition, Leaf{Position{-1, -1}, false}}
+	return Ant{antPosition, nil}
 }
 
 func (ant *Ant) haveLeaf() bool {
-	return !(ant.leaf.x == -1 && ant.leaf.y == -1)
+	return ant.leaf != nil && !(ant.leaf.x == -1 && ant.leaf.y == -1)
 }
 
-func (ant *Ant) pickUpLeaf(leaf Leaf) {
+func (ant *Ant) pickUpLeaf(leaf *Leaf) {
 	if ant.haveLeaf() {
 		ant.dropLeaf()
 	}
@@ -79,7 +79,7 @@ func (ant *Ant) pickUpLeaf(leaf Leaf) {
 
 func (ant *Ant) dropLeaf() {
 	ant.leaf.pickedUp = false
-	ant.leaf = Leaf{Position{-1, -1}, false}
+	ant.leaf = nil
 }
 
 func makeAntList(population int) []Ant {
@@ -111,13 +111,13 @@ func makeLeafList(population int) []Leaf {
 	return antList
 }
 
-func findLeafOnPositionInList(x, y int, list []Leaf) (int, Leaf) {
+func findLeafOnPositionInList(x, y int, list []Leaf) (int, *Leaf) {
 	for index, leaf := range list {
 		if leaf.x == x && leaf.y == y {
-			return index, leaf
+			return index, &list[index]
 		}
 	}
-	return -1, Leaf{Position{-1, -1}, false}
+	return -1, nil
 }
 
 // Terrarium -----------------------------------------------
@@ -185,6 +185,7 @@ func (trr *Terrarium) placeAntsAndLeaves(ants []Ant, leaves []Leaf) {
 func (trr *Terrarium) moveAnts(ants []Ant, leaves []Leaf) {
 	for index, _ := range ants {
 		ant := &ants[index]
+		tries := 1
 		for {
 			// Get random vector
 			xMove := randomNumber(-1, 1)
@@ -199,14 +200,18 @@ func (trr *Terrarium) moveAnts(ants []Ant, leaves []Leaf) {
 			// Perform movement
 			switch moved := trr.matrix[ant.x+xMove][ant.y+yMove]; moved {
 			case 1, 3:
-				// Case where filed was taken by another ant - let's assume it's not moving then
-				break
+				// Case where filed was taken by another ant- let's assume it's trying three times, not moving otherwise
+				tries++
+				if tries != 4 {
+					continue
+				}
 			case 0:
 				// Case empty field
 				trr.matrix[ant.x][ant.y] = 0
 				ant.move(xMove, yMove)
 				if ant.haveLeaf() {
 					trr.matrix[ant.x][ant.y] = 3
+					ant.leaf.move(xMove, yMove)
 				} else {
 					trr.matrix[ant.x][ant.y] = 1
 				}
@@ -222,6 +227,7 @@ func (trr *Terrarium) moveAnts(ants []Ant, leaves []Leaf) {
 				ant.move(xMove, yMove)
 				_, leaf := findLeafOnPositionInList(ant.x, ant.y, leaves)
 				ant.pickUpLeaf(leaf)
+				//ant.leaf.move(xMove, yMove)
 				trr.matrix[ant.x][ant.y] = 3
 			}
 			break
