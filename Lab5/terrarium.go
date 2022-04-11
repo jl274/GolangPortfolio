@@ -26,3 +26,13 @@ func (position Position) move(x, y int) {
 	position.x += x
 	position.y += y
 }
+
+// Ant -----------------------------------------------------
+type Ant struct {
+	position Position
+}
+
+// Leaf ----------------------------------------------------
+type Leaf struct {
+	position Position
+}
