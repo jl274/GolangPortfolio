@@ -11,14 +11,16 @@ var xTerrarium int = 15
 var yTerrarium int = 15
 
 func main() {
-	ant := constructRandomAnt()
-	leaf := constructRandomLeaf()
-	fmt.Println(ant, leaf)
-	trr := constructTerrarium()
-	trr.matrix[0][1] = 2
-	trr.matrix[2][10] = 1
-	trr.matrix[7][11] = 2
-	trr.print()
+	Simulation()
+}
+
+// Simulation ----------------------------------------------
+func Simulation() {
+	terrarium := constructTerrarium()
+	ants := makeAntList(7)
+	leaves := makeLeafList(10)
+	terrarium.placeAntsAndLeaves(ants, leaves)
+	terrarium.print()
 }
 
 // Random number -------------------------------------------
@@ -45,7 +47,8 @@ type Ant struct {
 }
 
 func constructRandomAnt() Ant {
-	x, y := randomNumber(0, xTerrarium), randomNumber(0, yTerrarium)
+	x := randomNumber(0, xTerrarium-1)
+	y := randomNumber(0, yTerrarium-1)
 	antPosition := Position{x, y}
 	return Ant{antPosition, Leaf{Position{-1, -1}, false}}
 }
@@ -68,7 +71,7 @@ func (ant Ant) dropLeaf() {
 }
 
 func makeAntList(population int) []Ant {
-	antList := make([]Ant, population, population)
+	antList := make([]Ant, 0, population)
 	for i := 0; i < population; i++ {
 		antList = append(antList, constructRandomAnt())
 	}
@@ -82,13 +85,14 @@ type Leaf struct {
 }
 
 func constructRandomLeaf() Leaf {
-	x, y := randomNumber(0, xTerrarium), randomNumber(0, yTerrarium)
+	x := randomNumber(0, xTerrarium-1)
+	y := randomNumber(0, yTerrarium-1)
 	leafPosition := Position{x, y}
 	return Leaf{leafPosition, false}
 }
 
 func makeLeafList(population int) []Leaf {
-	antList := make([]Leaf, population, population)
+	antList := make([]Leaf, 0, population)
 	for i := 0; i < population; i++ {
 		antList = append(antList, constructRandomLeaf())
 	}
@@ -128,5 +132,30 @@ func (trr Terrarium) print() {
 			}
 		}
 		fmt.Println("")
+	}
+}
+
+func (trr Terrarium) placeAntsAndLeaves(ants []Ant, leaves []Leaf) {
+	for antIndex, ant := range ants {
+		if trr.matrix[ant.x][ant.y] != 0 {
+			antTemp := constructRandomAnt()
+			for trr.matrix[antTemp.x][antTemp.y] != 0 {
+				antTemp = constructRandomAnt()
+			}
+			ants[antIndex] = antTemp
+			ant = antTemp
+		}
+		trr.matrix[ant.x][ant.y] = 1
+	}
+	for leafIndex, leaf := range leaves {
+		if trr.matrix[leaf.x][leaf.y] != 0 {
+			leafTemp := constructRandomLeaf()
+			for trr.matrix[leafTemp.x][leafTemp.y] != 0 {
+				leafTemp = constructRandomLeaf()
+			}
+			leaves[leafIndex] = leafTemp
+			leaf = leafTemp
+		}
+		trr.matrix[leaf.x][leaf.y] = 2
 	}
 }
