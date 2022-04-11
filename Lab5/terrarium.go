@@ -6,8 +6,14 @@ import (
 	"time"
 )
 
+// Settings ------------------------------------------------
+var xTerrarium int = 15
+var yTerrarium int = 15
+
 func main() {
-	fmt.Println("ok")
+	ant := constructRandomAnt()
+	leaf := constructRandomLeaf()
+	fmt.Println(ant, leaf)
 }
 
 // Random number -------------------------------------------
@@ -32,7 +38,19 @@ type Ant struct {
 	position Position
 }
 
+func constructRandomAnt() Ant {
+	x, y := randomNumber(0, xTerrarium), randomNumber(0, yTerrarium)
+	antPosition := Position{x, y}
+	return Ant{antPosition}
+}
+
 // Leaf ----------------------------------------------------
 type Leaf struct {
 	position Position
+}
+
+func constructRandomLeaf() Leaf {
+	x, y := randomNumber(0, xTerrarium), randomNumber(0, yTerrarium)
+	leafPosition := Position{x, y}
+	return Leaf{leafPosition}
 }
