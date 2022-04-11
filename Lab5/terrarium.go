@@ -35,7 +35,7 @@ func (position Position) move(x, y int) {
 
 // Ant -----------------------------------------------------
 type Ant struct {
-	position Position
+	Position
 }
 
 func constructRandomAnt() Ant {
@@ -44,13 +44,47 @@ func constructRandomAnt() Ant {
 	return Ant{antPosition}
 }
 
+func makeAntList(population int) []Ant {
+	antList := make([]Ant, population, population)
+	for i := 0; i < population; i++ {
+		antList = append(antList, constructRandomAnt())
+	}
+	return antList
+}
+
 // Leaf ----------------------------------------------------
 type Leaf struct {
-	position Position
+	Position
 }
 
 func constructRandomLeaf() Leaf {
 	x, y := randomNumber(0, xTerrarium), randomNumber(0, yTerrarium)
 	leafPosition := Position{x, y}
 	return Leaf{leafPosition}
+}
+
+func makeLeafList(population int) []Leaf {
+	antList := make([]Leaf, population, population)
+	for i := 0; i < population; i++ {
+		antList = append(antList, constructRandomLeaf())
+	}
+	return antList
+}
+
+// Terrarium -----------------------------------------------
+type Terrarium struct {
+	/*
+		0 - nothing
+		1 - ant
+		2 - leaf
+	*/
+	matrix [][]int
+}
+
+func constructTerrarium() Terrarium {
+	terrariumMatrix := make([][]int, xTerrarium, xTerrarium)
+	for i := 0; i < xTerrarium; i++ {
+		terrariumMatrix[i] = make([]int, yTerrarium, yTerrarium)
+	}
+	return Terrarium{terrariumMatrix}
 }
