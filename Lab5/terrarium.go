@@ -11,19 +11,26 @@ var xTerrarium int = 15
 var yTerrarium int = 15
 
 func main() {
-	Simulation(10)
+	Simulation(30, false)
 }
 
 // Simulation ----------------------------------------------
-func Simulation(iterations int) {
+func Simulation(iterations int, printEveryStep bool) {
 	terrarium := constructTerrarium()
 	ants := makeAntList(7)
 	leaves := makeLeafList(10)
 	terrarium.placeAntsAndLeaves(ants, leaves)
 	terrarium.print()
 	for i := 0; i < iterations; i++ {
-		fmt.Printf("\n---------------------\n\n")
+
 		terrarium.moveAnts(ants, leaves)
+		if printEveryStep {
+			fmt.Printf("\n---------------------\n\n")
+			terrarium.print()
+		}
+	}
+	if !printEveryStep {
+		fmt.Printf("\n---------------------\n\n")
 		terrarium.print()
 	}
 }
@@ -176,9 +183,9 @@ func (trr *Terrarium) placeAntsAndLeaves(ants []Ant, leaves []Leaf) {
 }
 
 func (trr *Terrarium) moveAnts(ants []Ant, leaves []Leaf) {
-	for _, ant := range ants {
+	for index, _ := range ants {
+		ant := &ants[index]
 		for {
-			//fmt.Println(ant)
 			// Get random vector
 			xMove := randomNumber(-1, 1)
 			yMove := randomNumber(-1, 1)
@@ -196,10 +203,8 @@ func (trr *Terrarium) moveAnts(ants []Ant, leaves []Leaf) {
 				break
 			case 0:
 				// Case empty field
-				//fmt.Printf("Before %v", ant)
 				trr.matrix[ant.x][ant.y] = 0
 				ant.move(xMove, yMove)
-				//fmt.Printf("After %v\n", ant)
 				if ant.haveLeaf() {
 					trr.matrix[ant.x][ant.y] = 3
 				} else {
