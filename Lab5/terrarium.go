@@ -21,6 +21,9 @@ func Simulation() {
 	leaves := makeLeafList(10)
 	terrarium.placeAntsAndLeaves(ants, leaves)
 	terrarium.print()
+	fmt.Printf("\n---------------------\n\n")
+	terrarium.moveAnts(ants, leaves)
+	terrarium.print()
 }
 
 // Random number -------------------------------------------
@@ -35,7 +38,7 @@ type Position struct {
 	y int
 }
 
-func (position Position) move(x, y int) {
+func (position *Position) move(x, y int) {
 	position.x += x
 	position.y += y
 }
@@ -57,7 +60,7 @@ func (ant Ant) haveLeaf() bool {
 	return !(ant.leaf.x == -1 && ant.leaf.y == -1)
 }
 
-func (ant Ant) pickUpLeaf(leaf Leaf) {
+func (ant *Ant) pickUpLeaf(leaf Leaf) {
 	if ant.haveLeaf() {
 		ant.dropLeaf()
 	}
@@ -65,7 +68,7 @@ func (ant Ant) pickUpLeaf(leaf Leaf) {
 	leaf.pickedUp = true
 }
 
-func (ant Ant) dropLeaf() {
+func (ant *Ant) dropLeaf() {
 	ant.leaf.pickedUp = false
 	ant.leaf = Leaf{Position{-1, -1}, false}
 }
@@ -99,12 +102,22 @@ func makeLeafList(population int) []Leaf {
 	return antList
 }
 
+func findLeafOnPositionInList(x, y int, list []Leaf) (int, Leaf) {
+	for index, leaf := range list {
+		if leaf.x == x && leaf.y == y {
+			return index, leaf
+		}
+	}
+	return -1, Leaf{Position{-1, -1}, false}
+}
+
 // Terrarium -----------------------------------------------
 type Terrarium struct {
 	/*
 		0 - nothing
 		1 - ant
 		2 - leaf
+		3 - ant caring leaf
 	*/
 	matrix [][]int
 }
@@ -117,7 +130,7 @@ func constructTerrarium() Terrarium {
 	return Terrarium{terrariumMatrix}
 }
 
-func (trr Terrarium) print() {
+func (trr *Terrarium) print() {
 	for _, row := range trr.matrix {
 		for _, cell := range row {
 			switch cell {
@@ -135,7 +148,7 @@ func (trr Terrarium) print() {
 	}
 }
 
-func (trr Terrarium) placeAntsAndLeaves(ants []Ant, leaves []Leaf) {
+func (trr *Terrarium) placeAntsAndLeaves(ants []Ant, leaves []Leaf) {
 	for antIndex, ant := range ants {
 		if trr.matrix[ant.x][ant.y] != 0 {
 			antTemp := constructRandomAnt()
@@ -157,5 +170,45 @@ func (trr Terrarium) placeAntsAndLeaves(ants []Ant, leaves []Leaf) {
 			leaf = leafTemp
 		}
 		trr.matrix[leaf.x][leaf.y] = 2
+	}
+}
+
+func (trr *Terrarium) moveAnts(ants []Ant, leaves []Leaf) {
+	for _, ant := range ants {
+		for {
+			// Get random vector
+			xMove := randomNumber(-1, 1)
+			yMove := randomNumber(-1, 1)
+			// Reverse part of vector if move outside terrarium
+			if ant.x+xMove < 0 || ant.x+xMove >= xTerrarium {
+				xMove = -xMove
+			}
+			if ant.y+yMove < 0 || ant.y+yMove >= yTerrarium {
+				yMove = -yMove
+			}
+			// Perform movement
+			switch moved := trr.matrix[ant.x+xMove][ant.y+yMove]; moved {
+			case 1, 3:
+				// Case where filed was taken by another ant
+				continue
+			case 0:
+				// Case empty field
+				trr.matrix[ant.x][ant.y] = 0
+				ant.move(xMove, yMove)
+				trr.matrix[ant.x][ant.y] = 1
+			case 2:
+				// Case met leaf
+				if ant.haveLeaf() {
+					trr.matrix[ant.x][ant.y] = 2
+				} else {
+					trr.matrix[ant.x][ant.y] = 0
+				}
+				ant.move(xMove, yMove)
+				_, leaf := findLeafOnPositionInList(ant.x, ant.y, leaves)
+				ant.pickUpLeaf(leaf)
+				trr.matrix[ant.x][ant.y] = 3
+			}
+			break
+		}
 	}
 }
