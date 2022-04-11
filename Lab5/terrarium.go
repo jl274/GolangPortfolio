@@ -11,19 +11,21 @@ var xTerrarium int = 15
 var yTerrarium int = 15
 
 func main() {
-	Simulation()
+	Simulation(10)
 }
 
 // Simulation ----------------------------------------------
-func Simulation() {
+func Simulation(iterations int) {
 	terrarium := constructTerrarium()
 	ants := makeAntList(7)
 	leaves := makeLeafList(10)
 	terrarium.placeAntsAndLeaves(ants, leaves)
 	terrarium.print()
-	fmt.Printf("\n---------------------\n\n")
-	terrarium.moveAnts(ants, leaves)
-	terrarium.print()
+	for i := 0; i < iterations; i++ {
+		fmt.Printf("\n---------------------\n\n")
+		terrarium.moveAnts(ants, leaves)
+		terrarium.print()
+	}
 }
 
 // Random number -------------------------------------------
@@ -56,7 +58,7 @@ func constructRandomAnt() Ant {
 	return Ant{antPosition, Leaf{Position{-1, -1}, false}}
 }
 
-func (ant Ant) haveLeaf() bool {
+func (ant *Ant) haveLeaf() bool {
 	return !(ant.leaf.x == -1 && ant.leaf.y == -1)
 }
 
@@ -176,6 +178,7 @@ func (trr *Terrarium) placeAntsAndLeaves(ants []Ant, leaves []Leaf) {
 func (trr *Terrarium) moveAnts(ants []Ant, leaves []Leaf) {
 	for _, ant := range ants {
 		for {
+			//fmt.Println(ant)
 			// Get random vector
 			xMove := randomNumber(-1, 1)
 			yMove := randomNumber(-1, 1)
@@ -189,17 +192,25 @@ func (trr *Terrarium) moveAnts(ants []Ant, leaves []Leaf) {
 			// Perform movement
 			switch moved := trr.matrix[ant.x+xMove][ant.y+yMove]; moved {
 			case 1, 3:
-				// Case where filed was taken by another ant
-				continue
+				// Case where filed was taken by another ant - let's assume it's not moving then
+				break
 			case 0:
 				// Case empty field
+				//fmt.Printf("Before %v", ant)
 				trr.matrix[ant.x][ant.y] = 0
 				ant.move(xMove, yMove)
-				trr.matrix[ant.x][ant.y] = 1
+				//fmt.Printf("After %v\n", ant)
+				if ant.haveLeaf() {
+					trr.matrix[ant.x][ant.y] = 3
+				} else {
+					trr.matrix[ant.x][ant.y] = 1
+				}
 			case 2:
 				// Case met leaf
 				if ant.haveLeaf() {
 					trr.matrix[ant.x][ant.y] = 2
+					ant.leaf.x = ant.x
+					ant.leaf.y = ant.y
 				} else {
 					trr.matrix[ant.x][ant.y] = 0
 				}
