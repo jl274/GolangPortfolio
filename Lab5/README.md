@@ -15,7 +15,7 @@ Terrarium is defined by emojis:
 
 ### Examples
 
-15x15 terrarium:
+#### 15x15 terrarium 7 ants 10 leaves
 * 1 step
 ```text
 🐜🔲🔲🔲🔲🔲🔲🔲🔲🔲🐜🔲🔲🔲🍃
@@ -163,3 +163,8 @@ Terrarium is defined by emojis:
 🔲🔲🔲🔲🔲🔲🔲🔲🔲🔲🔲🔲🔲🔲🔲
 🔲🔲🔲🔲🔲🔲🍃🔲🔲🔲🔲🔲🔲🔲🔲
 ```
+
+#### 20x15 terrarium 8 ants 16 leaves - "animation"
+
+50 steps:
+![Animation](50x50x8antsx16leaves.gif)

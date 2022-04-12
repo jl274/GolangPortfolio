@@ -3,30 +3,38 @@ package main
 import (
 	"fmt"
 	"math/rand"
+	"os"
+	"os/exec"
 	"time"
 )
 
 // Settings ------------------------------------------------
 var xTerrarium int = 15
-var yTerrarium int = 15
+var yTerrarium int = 20
 
 func main() {
-	Simulation(100, false)
+	Simulation(50, true)
 }
 
 // Simulation ----------------------------------------------
 func Simulation(iterations int, printEveryStep bool) {
 	terrarium := constructTerrarium()
-	ants := makeAntList(7)
-	leaves := makeLeafList(10)
+	ants := makeAntList(8)
+	leaves := makeLeafList(16)
 	terrarium.placeAntsAndLeaves(ants, leaves)
 	terrarium.print()
 	for i := 0; i < iterations; i++ {
 
 		terrarium.moveAnts(ants, leaves)
 		if printEveryStep {
+
+			cmd := exec.Command("cmd", "/c", "cls")
+			cmd.Stdout = os.Stdout
+			cmd.Run()
+
 			fmt.Printf("\n---------------------\n\n")
 			terrarium.print()
+			time.Sleep(1000 * time.Millisecond)
 		}
 	}
 	if !printEveryStep {
