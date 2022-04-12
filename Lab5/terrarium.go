@@ -197,6 +197,9 @@ func (trr *Terrarium) moveAnts(ants []Ant, leaves []Leaf) {
 			xMove := randomNumber(-1, 1)
 			yMove := randomNumber(-1, 1)
 			// Reverse part of vector if move outside terrarium
+			if xMove == 0 && yMove == 0 {
+				continue
+			}
 			if ant.x+xMove < 0 || ant.x+xMove >= xTerrarium {
 				xMove = -xMove
 			}
