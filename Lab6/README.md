@@ -61,4 +61,4 @@ Concurrency based ping pong game
     
 ### Ping Pong in action:
 
-[GIF](./pongv1.gif)
+![GIF](./pongv1.gif)
