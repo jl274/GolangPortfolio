@@ -6,7 +6,6 @@ import (
 )
 
 func main() {
-	fmt.Println("Test")
 	racket1 := NewRacket("Player1", "Ping!")
 	racket2 := NewRacket("Player2", "Pong!")
 	racket1.setOpponent(racket2)
