@@ -16,20 +16,21 @@ func main() {
 }
 
 // Ball message passed between two players
-type Ball string
+type Ball struct {
+	timesHit int
+}
 
 // Racket Struct defining player
 type Racket struct {
 	name     string
 	motto    string
-	playing  bool
 	receive  *chan Ball
 	opponent *Racket
 }
 
 func NewRacket(name, motto string) *Racket {
 	receive := make(chan Ball, 1)
-	racket := Racket{name, motto, false, &receive, nil}
+	racket := Racket{name, motto, &receive, nil}
 	return &racket
 }
 
@@ -38,22 +39,22 @@ func (thisRacket *Racket) setOpponent(opponent *Racket) {
 }
 
 func (thisRacket *Racket) passTheBall() {
+	var ball Ball
 	for {
-		fmt.Printf("%s: %s\n", thisRacket.name, thisRacket.motto)
+		ball = <-*thisRacket.receive
+		ball.timesHit++
+		fmt.Printf("(Hit %d) %s: %s\n", ball.timesHit, thisRacket.name, thisRacket.motto)
 		time.Sleep(1000 * time.Millisecond)
-		*thisRacket.opponent.receive <- Ball("")
-		<-*thisRacket.receive
+		*thisRacket.opponent.receive <- ball
 	}
 
 }
 
 func (thisRacket *Racket) getReady() {
-	go func() {
-		<-*thisRacket.receive
-		go thisRacket.passTheBall()
-	}()
+	go thisRacket.passTheBall()
 }
 
 func (thisRacket *Racket) serve() {
 	go thisRacket.passTheBall()
+	*thisRacket.receive <- Ball{0}
 }

@@ -1,6 +1,6 @@
 # Index
 
-## pongTable.go
+## pongTable.go v1
 
 Concurrency based ping pong game
 
@@ -62,3 +62,39 @@ Concurrency based ping pong game
 ### Ping Pong in action:
 
 ![GIF](./pongv1.gif)
+
+
+## pongTable.go v2
+
+Changes:
+* The ball was modified to count hits:
+  ```go
+  type Ball struct {
+      timesHit int
+  }
+  ```
+* "Waiting for the ball" loop was modified to increment Ball counter and send precise Ball pointer
+  ```go
+  func (thisRacket *Racket) passTheBall() {
+      var ball Ball
+      for {
+          ball = <-*thisRacket.receive
+          ball.timesHit++
+          fmt.Printf("(Hit %d) %s: %s\n", ball.timesHit, thisRacket.name, thisRacket.motto)
+          time.Sleep(1000 * time.Millisecond)
+          *thisRacket.opponent.receive <- ball
+      }
+  
+  }
+  ```
+* Because of that change, some refactoring was also needed in getReady and serve:
+  ```go
+  func (thisRacket *Racket) getReady() {
+      go thisRacket.passTheBall()
+  }
+  
+  func (thisRacket *Racket) serve() {
+      go thisRacket.passTheBall()
+      *thisRacket.receive <- Ball{0}
+  }
+  ```
