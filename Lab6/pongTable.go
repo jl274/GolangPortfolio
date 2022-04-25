@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
 func main() {
 	fmt.Println("Test")
@@ -31,6 +34,10 @@ func (thisRacket *Racket) setOpponent(opponent *Racket) {
 	thisRacket.opponent = opponent
 }
 
-//func (*Racket) letsPlay(c chan <- Ball){
-//
-//}
+func (thisRacket *Racket) passTheBall() {
+	fmt.Printf("%s: %s\n", thisRacket.name, thisRacket.motto)
+	time.Sleep(1000)
+	*thisRacket.opponent.receive <- Ball("")
+	<-*thisRacket.receive
+	thisRacket.passTheBall()
+}
