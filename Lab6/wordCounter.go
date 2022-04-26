@@ -38,7 +38,22 @@ type Reader struct {
 }
 
 func (r *Reader) read(line string) {
-	// working
+	line = strings.ReplaceAll(
+		strings.ReplaceAll(
+			strings.ReplaceAll(
+				strings.ReplaceAll(
+					strings.ReplaceAll(line, ".", ""),
+					",", ""),
+				"-", ""),
+			"?", ""),
+		"'", "")
+	lineArray := strings.Split(line, " ")
+	var resultMap counterMap
+	for _, word := range lineArray {
+		resultMap[word]++
+	}
+	r.supervisor.wordsBox <- resultMap
+	r.working = false
 }
 
 // File to string array
@@ -63,7 +78,7 @@ func (c *Counter) count(file string) counterMap {
 		for _, worker := range workers {
 			if !worker.working {
 				worker.working = true
-				worker.read(wordsArray[0])
+				go worker.read(wordsArray[0])
 				wordsArray = wordsArray[1:]
 			}
 		}
