@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -9,11 +10,11 @@ import (
 )
 
 func main() {
+	textFlag := flag.String("file", "text.txt", "Choose txt file")
+	workersFlag := flag.Int("w", 5, "Choose number of threads to handle the task")
+	flag.Parse()
 	witcherCounter := NewCounter()
-	result := witcherCounter.count("text.txt", 5)
-	//for k, v := range result {
-	//	fmt.Printf("%s: %d times\n", k, v)
-	//}
+	result := witcherCounter.count(*textFlag, *workersFlag)
 	printSortResult(result)
 
 }
