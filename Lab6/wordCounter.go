@@ -10,7 +10,7 @@ import (
 
 func main() {
 	witcherCounter := NewCounter()
-	result := witcherCounter.count("text.txt")
+	result := witcherCounter.count("text.txt", 5)
 	//for k, v := range result {
 	//	fmt.Printf("%s: %d times\n", k, v)
 	//}
@@ -88,17 +88,18 @@ func (c *Counter) readFile(file string) []string {
 }
 
 // Concurrency loop
-func (c *Counter) count(file string) counterMap {
+func (c *Counter) count(file string, workersNumber int) counterMap {
 	wordsArray := c.readFile(file)
 	maxLen := len(wordsArray)
-	workers := make([]Reader, 0, maxLen)
-	for i := 0; i < maxLen; i++ {
+	workers := make([]Reader, 0, workersNumber)
+	for i := 0; i < workersNumber; i++ {
 		workers = append(workers, c.MakeReader())
 	}
 	for {
 		if len(wordsArray) > 0 {
 			for _, worker := range workers {
-				if !worker.working {
+				// double check on len bc of concurrency
+				if !worker.working && len(wordsArray) > 0 {
 					worker.working = true
 					go worker.read(wordsArray[0])
 					wordsArray = wordsArray[1:]
