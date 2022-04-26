@@ -69,6 +69,7 @@ func (r *Reader) read(line string) {
 				"-", ""),
 			"?", ""),
 		"'", "")
+	line = strings.ToLower(line)
 	lineArray := strings.Fields(line)
 	resultMap := make(counterMap)
 	for _, word := range lineArray {
