@@ -1,6 +1,11 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
+)
 
 func main() {
 	fmt.Printf("Test\n")
@@ -29,4 +34,15 @@ func (c *Counter) MakeReader(line string) Reader {
 type Reader struct {
 	line       string
 	supervisor *Counter
+}
+
+// File to string array
+func (c *Counter) readFile() []string {
+	absPath, _ := filepath.Abs("results.csv")
+	f, err := os.ReadFile(absPath)
+	if err != nil {
+		err.Error()
+	}
+
+	return strings.Split(string(f), "\n")
 }
