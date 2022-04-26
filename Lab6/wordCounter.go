@@ -18,5 +18,5 @@ type Counter struct {
 // Reader receives lines, counts word in it and sends it back to Counter
 type Reader struct {
 	line       string
-	supervisor Counter
+	supervisor *Counter
 }
