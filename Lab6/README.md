@@ -98,3 +98,7 @@ Changes:
       *thisRacket.receive <- Ball{0}
   }
   ```
+  
+## wordCounter.go
+
+Program that Concurrently counts words in file and displays that result.
