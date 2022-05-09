@@ -1,5 +1,12 @@
 # Index
 
-## genericTypes.go2
+## genericTypes.go
 
-Contains simple functions that uses generic types as its arguments
+Contains simple functions that uses generic types as its arguments:
+* add
+* sumSlice
+* printMap
+* doesSliceContains
+* removeElemFromSlice
+* printInBox
+* printPoint
